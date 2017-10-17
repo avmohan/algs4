@@ -7,8 +7,8 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
  */
 public class Percolation {
 
-  // 0 means blocked site, 1 means open site.
-  private final int[][] grid;
+  // false means blocked site, true means open site.
+  private final boolean[][] grid;
 
   // size of grid
   private final int n;
@@ -44,7 +44,7 @@ public class Percolation {
     this.n = n;
     this.mainUf = new WeightedQuickUnionUF(n * n + 2);
     this.auxUf = new WeightedQuickUnionUF(n * n + 1);
-    this.grid = new int[n + 1][n + 1]; // just to use 1-based indexing.
+    this.grid = new boolean[n + 1][n + 1]; // just to use 1-based indexing.
 
     // aliases for the top & bot special nodes.
     this.topNode = 0;
@@ -57,7 +57,7 @@ public class Percolation {
     if (isOpen(row, col)) {
       return;
     }
-    grid[row][col] = 1;
+    grid[row][col] = true;
     numberOfOpenSites++;
 
     // If any of the neighbours are open, connect the corresponding nodes.
@@ -84,7 +84,7 @@ public class Percolation {
   // Is site (row, col) open?
   public boolean isOpen(int row, int col) {
     validateBounds(row, col);
-    return grid[row][col] == 1;
+    return grid[row][col];
   }
 
   // Is site (row, col) full?
