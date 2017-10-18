@@ -42,7 +42,7 @@ public class Percolation {
     this.botConnected = new boolean[n * n];
 
     // Slightly extra space for the convenience of 1-based indexing.
-    this.grid = new boolean[n + 1][n + 1];
+    this.grid = new boolean[n][n];
 
   }
 
@@ -54,7 +54,7 @@ public class Percolation {
     }
 
     // Open the site in grid.
-    grid[row][col] = true;
+    grid[row-1][col-1] = true;
     numberOfOpenSites++;
 
     // Find root node of current cell
@@ -98,7 +98,7 @@ public class Percolation {
   // Is site (row, col) open?
   public boolean isOpen(int row, int col) {
     validateBounds(row, col);
-    return grid[row][col];
+    return grid[row-1][col-1];
   }
 
   // Is site (row, col) full?
