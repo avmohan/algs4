@@ -15,26 +15,20 @@ public class Percolation {
 
   private int numberOfOpenSites;
 
-  // Size N*N + 2
-  // Has a joining point for top and bottom rows.
-  // top will be 0, grid will be 1 to N*N, bot will be N*N+1
-  // This is for the percolates query
+  // Will contain a node for each element in the grid.
   private final WeightedQuickUnionUF mainUf;
 
-  // Size N*N + 1
-  // Has a joining point for top rows only.
-  // top will be 0, grid will be 1 to N*N
-  // This is for the isFull query (to avoid back-wash)
-  private final WeightedQuickUnionUF auxUf;
+  // To check if a cell is connected to top, check topConnected[uf.find(getNode(row, col)]
+  // whenever unions are performed, keep these in sync.
+  private boolean[] topConnected;
+  private boolean[] botConnected;
 
-  // Aliases for top & bottom join nodes in the union find structures.
-  private final int topNode; // 0
-  private final int botNode; // N*N+1
+  // flag to indicate if system percolates.
+  private boolean percolates;
 
-  // For the 4 neighbours - top, right, bot, left
+  // Offsets for the 4 neighbours - top, right, bot, left
   private static final int[] dRow = {-1, 0, 1, 0};
   private static final int[] dCol = {0, 1, 0, -1};
-
 
   // Create n-by-n grid, with all sites blocked
   public Percolation(int n) {
@@ -42,13 +36,14 @@ public class Percolation {
       throw new IllegalArgumentException("Grid size should be greater than zero.");
     }
     this.n = n;
-    this.mainUf = new WeightedQuickUnionUF(n * n + 2);
-    this.auxUf = new WeightedQuickUnionUF(n * n + 1);
-    this.grid = new boolean[n + 1][n + 1]; // just to use 1-based indexing.
 
-    // aliases for the top & bot special nodes.
-    this.topNode = 0;
-    this.botNode = n * n + 1;
+    this.mainUf = new WeightedQuickUnionUF(n * n);
+    this.topConnected = new boolean[n * n];
+    this.botConnected = new boolean[n * n];
+
+    // Slightly extra space for the convenience of 1-based indexing.
+    this.grid = new boolean[n + 1][n + 1];
+
   }
 
   // Open site (row, col) if it is not open already
@@ -57,27 +52,46 @@ public class Percolation {
     if (isOpen(row, col)) {
       return;
     }
+
+    // Open the site in grid.
     grid[row][col] = true;
     numberOfOpenSites++;
 
-    // If any of the neighbours are open, connect the corresponding nodes.
-    for (int i = 0; i < 4; i++) {
-      int nRow = row + dRow[i];
-      int nCol = col + dCol[i];
-      if (isValid(nRow, nCol) && isOpen(nRow, nCol)) {
-        mainUf.union(getNode(row, col), getNode(nRow, nCol));
-        auxUf.union(getNode(row, col), getNode(nRow, nCol));
-      }
+    // Find root node of current cell
+    // Root will always be the root node of the component containing the cell being opened.
+    int root = mainUf.find(getNode(row, col));
+
+    // If a top row cell is being opened, set topConnected to true.
+    if (row == 1) {
+      topConnected[root] = true;
     }
 
-    if (row == 1) {
-      // if in top row, connect to special top node (both main & aux uf)
-      mainUf.union(topNode, getNode(row, col));
-      auxUf.union(topNode, getNode(row, col));
-    }
+    // If a bot row cell is being opened, set botConnected to true.
     if (row == n) {
-      // if in bot row, connect to special bot node (only main uf)
-      mainUf.union(botNode, getNode(row, col));
+      botConnected[root] = true;
+    }
+
+    // If any of the neighbours are open, connect the corresponding nodes.
+    for (int i = 0; i < 4; i++) {
+      int neighbourRow = row + dRow[i];
+      int neighbourCol = col + dCol[i];
+      if (isValid(neighbourRow, neighbourCol) && isOpen(neighbourRow, neighbourCol)) {
+        // Find the root of the neighbour
+        int neighbourRoot = mainUf.find(getNode(neighbourRow, neighbourCol));
+
+        // Merge the 2 components (Better use roots for merging as we have them anyway)
+        mainUf.union(root, neighbourRoot);
+
+        // Update topConnected & botConnected - if either is connected, the new component will
+        // also be connected.
+        int newRoot = mainUf.find(getNode(row, col));
+        topConnected[newRoot] = topConnected[root] || topConnected[neighbourRoot];
+        botConnected[newRoot] = botConnected[root] || botConnected[neighbourRoot];
+        root = newRoot;
+      }
+    }
+    if(topConnected[root] && botConnected[root]) {
+      percolates = true;
     }
   }
 
@@ -90,7 +104,7 @@ public class Percolation {
   // Is site (row, col) full?
   public boolean isFull(int row, int col) {
     validateBounds(row, col);
-    return auxUf.connected(topNode, getNode(row, col));
+    return topConnected[mainUf.find(getNode(row, col))];
   }
 
   // Number of open sites
@@ -100,7 +114,7 @@ public class Percolation {
 
   // Does the system percolate?
   public boolean percolates() {
-    return mainUf.connected(topNode, botNode);
+    return percolates;
   }
 
   private boolean isValid(int row, int col) {
@@ -116,7 +130,7 @@ public class Percolation {
   // Get the union-find structure node for a given cell.
   private int getNode(int row, int col) {
     validateBounds(row, col);
-    return (row - 1) * n + col;
+    return (row - 1) * n + col - 1;
   }
 
   public static void main(String[] args) {
@@ -131,6 +145,19 @@ public class Percolation {
     println(p.percolates());
     p.open(1, 1);
     println(p.percolates());
+
+    p = new Percolation(3);
+    p.open(1, 1);
+    p.open(3, 1);
+    println(p.percolates()); // false
+    println(p.isFull(1, 1)); // true
+    println(p.isFull(3, 1)); // false
+    p.open(1, 3);
+    p.open(2, 3);
+    println(p.percolates()); // false
+    p.open(3, 3);
+    println(p.percolates()); // true
+    println(p.isFull(3, 1)); // false
   }
 
 }
