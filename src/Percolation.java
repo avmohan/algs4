@@ -7,8 +7,48 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
  */
 public class Percolation {
 
-  // false means blocked site, true means open site.
-  private final boolean[][] grid;
+  // Encodes 3 values.
+  // 0th bit of every byte indicates whether the positionis open or closed
+  // 1st bit indicates if it's connected to top. (only relevant if it's a root)
+  // 2nd bit indicates if it's connected to bot. (only relevant if it's a root)
+  private byte flags[];
+
+  // get k-th bit from right in flag[i]
+  private boolean getBit(int i, int k) {
+    return ((flags[i] >> k) & 1) == 1;
+  }
+
+  // set k-th bit from right in flag[i]
+  private void setBit(int i, int k) {
+    flags[i] |= 1 << k;
+  }
+
+  // Oth bit in flags used for grid
+  private boolean grid(int row, int col) {
+    return getBit(getNode(row, col), 0);
+  }
+
+  private void setGrid(int row, int col) {
+    setBit(getNode(row, col), 0);
+  }
+
+  // 1st bit in flags used for topConnected
+  private boolean topConnected(int node) {
+    return getBit(node, 1);
+  }
+
+  private void setTopConnected(int node) {
+    setBit(node, 1);
+  }
+
+  // 2nd bit in flags used for botConnected
+  private boolean botConnected(int node) {
+    return getBit(node, 2);
+  }
+
+  private void setBotConnected(int node) {
+    setBit(node, 2);
+  }
 
   // size of grid
   private final int n;
@@ -17,11 +57,6 @@ public class Percolation {
 
   // Will contain a node for each element in the grid.
   private final WeightedQuickUnionUF mainUf;
-
-  // To check if a cell is connected to top, check topConnected[uf.find(getNode(row, col)]
-  // whenever unions are performed, keep these in sync.
-  private boolean[] topConnected;
-  private boolean[] botConnected;
 
   // flag to indicate if system percolates.
   private boolean percolates;
@@ -38,12 +73,7 @@ public class Percolation {
     this.n = n;
 
     this.mainUf = new WeightedQuickUnionUF(n * n);
-    this.topConnected = new boolean[n * n];
-    this.botConnected = new boolean[n * n];
-
-    // Slightly extra space for the convenience of 1-based indexing.
-    this.grid = new boolean[n][n];
-
+    this.flags = new byte[n * n];
   }
 
   // Open site (row, col) if it is not open already
@@ -54,7 +84,7 @@ public class Percolation {
     }
 
     // Open the site in grid.
-    grid[row-1][col-1] = true;
+    setGrid(row, col);
     numberOfOpenSites++;
 
     // Find root node of current cell
@@ -63,12 +93,12 @@ public class Percolation {
 
     // If a top row cell is being opened, set topConnected to true.
     if (row == 1) {
-      topConnected[root] = true;
+      setTopConnected(root);
     }
 
     // If a bot row cell is being opened, set botConnected to true.
     if (row == n) {
-      botConnected[root] = true;
+      setBotConnected(root);
     }
 
     // If any of the neighbours are open, connect the corresponding nodes.
@@ -85,12 +115,16 @@ public class Percolation {
         // Update topConnected & botConnected - if either is connected, the new component will
         // also be connected.
         int newRoot = mainUf.find(getNode(row, col));
-        topConnected[newRoot] = topConnected[root] || topConnected[neighbourRoot];
-        botConnected[newRoot] = botConnected[root] || botConnected[neighbourRoot];
+        if (topConnected(root) || topConnected(neighbourRoot)) {
+          setTopConnected(newRoot);
+        }
+        if (botConnected(root) || botConnected(neighbourRoot)) {
+          setBotConnected(newRoot);
+        }
         root = newRoot;
       }
     }
-    if(topConnected[root] && botConnected[root]) {
+    if (topConnected(root) && botConnected(root)) {
       percolates = true;
     }
   }
@@ -98,13 +132,13 @@ public class Percolation {
   // Is site (row, col) open?
   public boolean isOpen(int row, int col) {
     validateBounds(row, col);
-    return grid[row-1][col-1];
+    return grid(row, col);
   }
 
   // Is site (row, col) full?
   public boolean isFull(int row, int col) {
     validateBounds(row, col);
-    return topConnected[mainUf.find(getNode(row, col))];
+    return topConnected(mainUf.find(getNode(row, col)));
   }
 
   // Number of open sites
