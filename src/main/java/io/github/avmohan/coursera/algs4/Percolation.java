@@ -1,3 +1,5 @@
+package io.github.avmohan.coursera.algs4;
+
 import static edu.princeton.cs.algs4.StdOut.println;
 
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
