@@ -1,6 +1,5 @@
-package io.github.avmohan.coursera.algs4;
+package io.github.avmohan.coursera.algs4.week1;
 
-import static edu.princeton.cs.algs4.StdOut.println;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 /**
@@ -12,7 +11,7 @@ public class Percolation {
     // 0th bit of every byte indicates whether the positionis open or closed
     // 1st bit indicates if it's connected to top. (only relevant if it's a root)
     // 2nd bit indicates if it's connected to bot. (only relevant if it's a root)
-    private byte flags[];
+    private byte[] flags;
 
     // get k-th bit from right in flag[i]
     private boolean getBit(int i, int k) {
@@ -166,33 +165,6 @@ public class Percolation {
     private int getNode(int row, int col) {
         validateBounds(row, col);
         return (row - 1) * n + col - 1;
-    }
-
-    public static void main(String[] args) {
-        Percolation p = new Percolation(2);
-        println(p.percolates());
-        p.open(1, 1);
-        p.open(2, 1);
-        println(p.percolates());
-        println(p.isFull(2, 1));
-
-        p = new Percolation(1);
-        println(p.percolates());
-        p.open(1, 1);
-        println(p.percolates());
-
-        p = new Percolation(3);
-        p.open(1, 1);
-        p.open(3, 1);
-        println(p.percolates()); // false
-        println(p.isFull(1, 1)); // true
-        println(p.isFull(3, 1)); // false
-        p.open(1, 3);
-        p.open(2, 3);
-        println(p.percolates()); // false
-        p.open(3, 3);
-        println(p.percolates()); // true
-        println(p.isFull(3, 1)); // false
     }
 
 }
