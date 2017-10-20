@@ -7,18 +7,17 @@ import java.util.NoSuchElementException;
 /**
  * Created by avmohan on 19/10/17.
  */
-public class RandomizedQueue<T> implements Iterable<T> {
+public class RandomizedQueue<Item> implements Iterable<Item> {
     /*
     The elements will be stored in items[0..size-1]. To remove a random element, pick a random
     element, swap with the last element and shrink
      */
 
-    private T[] items;
+    private Item[] items;
     private int size;
 
-    @SuppressWarnings("unchecked")
     public RandomizedQueue() {
-        items = (T[]) new Object[2];
+        items = (Item[]) new Object[2];
     }
 
     public boolean isEmpty() {
@@ -30,7 +29,7 @@ public class RandomizedQueue<T> implements Iterable<T> {
         return size;
     }
 
-    public void enqueue(T item) {
+    public void enqueue(Item item) {
         if (item == null) throw new IllegalArgumentException("Null items not allowed");
         if (size == items.length) {
             resizeItems(items.length * 2);
@@ -39,10 +38,10 @@ public class RandomizedQueue<T> implements Iterable<T> {
         size++;
     }
 
-    public T dequeue() {
+    public Item dequeue() {
         if (isEmpty()) throw new NoSuchElementException("Queue is empty");
         int index = StdRandom.uniform(size);
-        T item = items[index];
+        Item item = items[index];
         items[index] = items[size - 1];
         items[size - 1] = null;
         size--;
@@ -52,25 +51,24 @@ public class RandomizedQueue<T> implements Iterable<T> {
         return item;
     }
 
-    public T sample() {
+    public Item sample() {
         if (isEmpty()) throw new NoSuchElementException("Queue is empty");
         return items[StdRandom.uniform(size)];
     }
 
     private void resizeItems(int newSize) {
-        @SuppressWarnings("unchecked")
-        T[] newItems = (T[]) new Object[newSize];
+        Item[] newItems = (Item[]) new Object[newSize];
         System.arraycopy(items, 0, newItems, 0, size);
         items = newItems;
     }
 
     @Override
-    public Iterator<T> iterator() {
+    public Iterator<Item> iterator() {
         return new RandomizedQueueIterator();
     }
 
 
-    private class RandomizedQueueIterator implements Iterator<T> {
+    private class RandomizedQueueIterator implements Iterator<Item> {
         int[] indices;
         int cur;
 
@@ -89,7 +87,7 @@ public class RandomizedQueue<T> implements Iterable<T> {
         }
 
         @Override
-        public T next() {
+        public Item next() {
             if (!hasNext()) throw new NoSuchElementException("Iterator has exhausted");
             return items[indices[cur++]];
         }
