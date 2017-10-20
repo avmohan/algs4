@@ -90,4 +90,32 @@ class RandomizedQueueTest {
         assertThat(q.sample()).isBetween(1, 100);
     }
 
+    @Test
+    void testNonemptyToEmptyToNonEmpty() throws Exception {
+        RandomizedQueue<Integer> q = new RandomizedQueue<>();
+        IntStream.range(0, 100).forEach(q::enqueue);
+        Integer[] zeroToNinetyNine = IntStream.range(0, 100).boxed().toArray(Integer[]::new);
+        assertThat(q).hasSize(100).containsOnly(zeroToNinetyNine);
+        IntStream.range(0, 100).forEach(x -> q.dequeue());
+        assertThat(q).hasSize(0);
+        IntStream.range(0, 100).forEach(q::enqueue);
+        assertThat(q).hasSize(100).containsOnly(zeroToNinetyNine);
+    }
+
+    @Test
+    void testForCornerCaseAroundArrayResizing() throws Exception {
+        RandomizedQueue<Integer> q= new RandomizedQueue<>();
+        IntStream.rangeClosed(1, 4).forEach(q::enqueue);
+        assertThat(q).hasSize(4);
+        IntStream.rangeClosed(1, 4).forEach(z->q.dequeue());
+        assertThat(q).hasSize(0);
+        q.enqueue(1);
+        assertThat(q).hasSize(1);
+        q.dequeue();
+        assertThat(q).hasSize(0);
+        q.enqueue(1);
+        assertThat(q).hasSize(1);
+    }
+
+
 }
