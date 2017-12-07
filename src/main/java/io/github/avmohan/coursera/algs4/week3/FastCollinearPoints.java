@@ -15,7 +15,7 @@ public class FastCollinearPoints {
 
     public FastCollinearPoints(Point[] points) {
         validatePoints(points);
-        this.points = points;
+        this.points = Arrays.copyOf(points, points.length);
     }
 
     public int numberOfSegments() {

@@ -17,7 +17,7 @@ public class BruteCollinearPoints {
 
     public BruteCollinearPoints(Point[] points) {
         validatePoints(points);
-        this.points = points;
+        this.points = Arrays.copyOf(points, points.length);
     }
 
     public int numberOfSegments() {
