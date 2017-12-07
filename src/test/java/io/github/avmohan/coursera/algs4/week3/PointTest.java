@@ -137,4 +137,11 @@ class PointTest {
         assertThat(p3).usingComparator(p1.slopeOrder()).isLessThan(p2);
     }
 
+    @Test
+    void test_AddFailingTestForInaccurateSlope() throws Exception {
+        Point p1 = new Point(466, 430);
+        Point p2 = new Point(2, 153);
+        assertThat(p1.slopeTo(p2)).isEqualTo(0.5969827586206896);
+    }
+
 }
