@@ -58,7 +58,7 @@ public class FastCollinearPoints {
                     // less than the min Point of segmentPoints in order to count this segment.
                     if (curPoint.compareTo(minPoint) < 0) {
                         Point maxPoint = Collections.max(segmentPoints);
-                        segments.add(new LineSegment(minPoint, maxPoint));
+                        segments.add(new LineSegment(curPoint, maxPoint));
                     }
                 }
                 j = k;
