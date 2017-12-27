@@ -1,6 +1,4 @@
-package io.github.avmohan.coursera.algs4.week1;
-
-import static org.junit.jupiter.api.Assertions.*;
+package io.github.avmohan.coursera.algs4.part1.week1;
 
 import org.junit.jupiter.api.Test;
 

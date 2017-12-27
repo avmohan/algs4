@@ -1,13 +1,8 @@
-package io.github.avmohan.coursera.algs4.week3;
+package io.github.avmohan.coursera.algs4.part1.week3;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-
-import javax.sound.sampled.Line;
 
 import org.junit.jupiter.api.Test;
 

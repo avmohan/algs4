@@ -1,4 +1,4 @@
-package io.github.avmohan.coursera.algs4.week3;
+package io.github.avmohan.coursera.algs4.part1.week3;
 
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;

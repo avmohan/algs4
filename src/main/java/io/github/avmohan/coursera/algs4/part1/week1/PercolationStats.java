@@ -1,4 +1,4 @@
-package io.github.avmohan.coursera.algs4.week1;
+package io.github.avmohan.coursera.algs4.part1.week1;
 
 import static edu.princeton.cs.algs4.StdOut.println;
 import edu.princeton.cs.algs4.StdRandom;

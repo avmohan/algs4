@@ -1,4 +1,4 @@
-package io.github.avmohan.coursera.algs4.week2;
+package io.github.avmohan.coursera.algs4.part1.week2;
 
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
