@@ -127,6 +127,11 @@ class KdTreeTest {
             .isEqualTo(new Point2D(0.564, 0.413));
     }
 
+    @Test
+    void testNearestReturnsNullForEmptySet() throws Exception {
+        assertThat(new KdTree().nearest(new Point2D(0, 0))).isNull();
+    }
+
     // TODO - Read input from file
     private KdTree input10() {
         KdTree set = new KdTree();

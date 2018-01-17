@@ -98,6 +98,13 @@ class PointSETTest {
             .isEqualTo(new Point2D(0.564, 0.413));
     }
 
+
+    @Test
+    void testNearestReturnsNullForEmptySet() throws Exception {
+        assertThat(new PointSET().nearest(new Point2D(0, 0))).isNull();
+    }
+
+
     private PointSET input10() {
         PointSET set = new PointSET();
         double input[][] = {

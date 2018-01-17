@@ -169,6 +169,35 @@ public class KdTree {
     // A nearest neighbour in the set to point p; null if the set is empty
     public Point2D nearest(Point2D p) {
         if (p == null) throw new IllegalArgumentException("p cannot be null in nearest");
-        return p;
+        if (isEmpty()) return null;
+        PointDistPair champ = new PointDistPair(root.p, p.distanceSquaredTo(root.p));
+        return nearestQuery(root, p, champ, 0).point;
+    }
+
+    private static class PointDistPair {
+        final Point2D point;
+        final double distSquared;
+
+        PointDistPair(Point2D point, double distSquared) {
+            this.point = point;
+            this.distSquared = distSquared;
+        }
+    }
+
+    private PointDistPair nearestQuery(Node node, Point2D queryPoint, PointDistPair champ, int depth) {
+        if (node != null && node.rect.distanceSquaredTo(queryPoint) < champ.distSquared) {
+            PointDistPair nodeDistPair = new PointDistPair(node.p, node.p.distanceSquaredTo(queryPoint));
+            if (nodeDistPair.distSquared < champ.distSquared) champ = nodeDistPair;
+            if (comparator(depth).compare(queryPoint, node.p) <= 0) {
+                // go lb then rt
+                champ = nearestQuery(node.lb, queryPoint, champ, depth + 1);
+                champ = nearestQuery(node.rt, queryPoint, champ, depth + 1);
+            } else {
+                // go rt then lb
+                champ = nearestQuery(node.rt, queryPoint, champ, depth + 1);
+                champ = nearestQuery(node.lb, queryPoint, champ, depth + 1);
+            }
+        }
+        return champ;
     }
 }
