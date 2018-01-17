@@ -84,7 +84,12 @@ class PointSETTest {
     @Test
     void testRangeWhenSomePointsInRect() throws Exception {
         assertThat(input10().range(new RectHV(0, 0, 0.5, 0.5)))
-            .hasSize(4);
+            .containsExactlyInAnyOrder(
+                new Point2D(0.372, 0.497),
+                new Point2D(0.144, 0.179),
+                new Point2D(0.417, 0.362),
+                new Point2D(0.499, 0.208)
+            );
     }
 
     @Test

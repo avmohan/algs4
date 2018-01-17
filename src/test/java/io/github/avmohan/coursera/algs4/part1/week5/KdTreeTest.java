@@ -107,7 +107,18 @@ class KdTreeTest {
     @Test
     void testRangeWhenSomePointsInRect() throws Exception {
         assertThat(input10().range(new RectHV(0, 0, 0.5, 0.5)))
-            .hasSize(4);
+            .containsExactlyInAnyOrder(
+                new Point2D(0.372, 0.497),
+                new Point2D(0.144, 0.179),
+                new Point2D(0.417, 0.362),
+                new Point2D(0.499, 0.208)
+            );
+    }
+
+    @Test
+    void testRangeWhenAllPointsInRect() throws Exception {
+        assertThat(input10().range(new RectHV(0.037109375, 0.134765625, 0.90234375, 0.958984375)))
+            .hasSize(10);
     }
 
     @Test
@@ -116,6 +127,7 @@ class KdTreeTest {
             .isEqualTo(new Point2D(0.564, 0.413));
     }
 
+    // TODO - Read input from file
     private KdTree input10() {
         KdTree set = new KdTree();
         double input[][] = {
