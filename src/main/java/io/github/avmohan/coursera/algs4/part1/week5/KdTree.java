@@ -14,30 +14,8 @@ public class KdTree {
     private static final Comparator<Point2D> X_COMP = Comparator.comparingDouble(Point2D::x);
     private static final Comparator<Point2D> Y_COMP = Comparator.comparingDouble(Point2D::y);
 
-    private static Comparator<Point2D> comparator(int depth) {
-        return (depth % 2 == 0) ? X_COMP : Y_COMP;
-    }
-
-    // Find the cut of curRect that is made by p
-    private static RectHV getNewRect(RectHV curRect, Point2D p, int depth, int direction) {
-        RectHV newRect;
-        if (depth % 2 == 0) {
-            if (direction == 0)
-                // left
-                newRect = new RectHV(curRect.xmin(), curRect.ymin(), p.x(), curRect.ymax());
-            else
-                // right
-                newRect = new RectHV(p.x(), curRect.ymin(), curRect.xmax(), curRect.ymax());
-        } else {
-            if (direction == 0)
-                // bottom
-                newRect = new RectHV(curRect.xmin(), curRect.ymin(), curRect.xmax(), p.y());
-            else
-                // top
-                newRect = new RectHV(curRect.xmin(), p.y(), curRect.xmax(), curRect.ymax());
-        }
-        return newRect;
-    }
+    private Node root;
+    private int size;
 
     // Each node corresponds to an axis-aligned rectangle in the unit square, which encloses all of the points in its subtree
     private static class Node {
@@ -62,12 +40,29 @@ public class KdTree {
         }
     }
 
-    private Node root;
-    private int size;
+    private static Comparator<Point2D> comparator(int depth) {
+        return (depth % 2 == 0) ? X_COMP : Y_COMP;
+    }
 
-    // Construct an empty set of points
-    public KdTree() {
-        // Defaults
+    // Find the cut of curRect that is made by p
+    private static RectHV getNewRect(RectHV curRect, Point2D p, int depth, int direction) {
+        RectHV newRect;
+        if (depth % 2 == 0) {
+            if (direction == 0)
+                // left
+                newRect = new RectHV(curRect.xmin(), curRect.ymin(), p.x(), curRect.ymax());
+            else
+                // right
+                newRect = new RectHV(p.x(), curRect.ymin(), curRect.xmax(), curRect.ymax());
+        } else {
+            if (direction == 0)
+                // bottom
+                newRect = new RectHV(curRect.xmin(), curRect.ymin(), curRect.xmax(), p.y());
+            else
+                // top
+                newRect = new RectHV(curRect.xmin(), p.y(), curRect.xmax(), curRect.ymax());
+        }
+        return newRect;
     }
 
     // Is the set empty?

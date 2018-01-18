@@ -27,7 +27,7 @@ public class PointSET {
 
     // Add the point to the set (if it is not already in the set)
     public void insert(Point2D p) {
-        if(p == null) throw new IllegalArgumentException("p cannot be null");
+        if (p == null) throw new IllegalArgumentException("p cannot be null");
         set.add(p);
     }
 
