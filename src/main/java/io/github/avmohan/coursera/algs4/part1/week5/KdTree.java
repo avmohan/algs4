@@ -50,6 +50,16 @@ public class KdTree {
             this.p = p;
             this.rect = rect;
         }
+
+        @Override
+        public String toString() {
+            return "Node{" +
+                "p=" + p +
+                ", rect=" + rect +
+                ", lb=" + lb +
+                ", rt=" + rt +
+                '}';
+        }
     }
 
     private Node root;
@@ -93,7 +103,7 @@ public class KdTree {
         }
 
         // Add on left or right subtree based on comparison of appropriate dimension
-        if (comparator(depth).compare(p, node.p) <= 0) {
+        if (comparator(depth).compare(p, node.p) < 0) {
             RectHV newRect = getNewRect(rect, node.p, depth, 0);
             node.lb = insert(node.lb, p, newRect, depth + 1);
         } else {
@@ -115,7 +125,7 @@ public class KdTree {
             return false;
         if (p.equals(node.p))
             return true;
-        if (comparator(depth).compare(p, node.p) <= 0)
+        if (comparator(depth).compare(p, node.p) < 0)
             return contains(node.lb, p, depth + 1);
         return contains(node.rt, p, depth + 1);
     }
@@ -147,7 +157,6 @@ public class KdTree {
         draw(node.rt, depth + 1);
     }
 
-    // TODO: Implement range & nearest.
     // All points that are inside the rectangle (or on the boundary)
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null) throw new IllegalArgumentException("rect cannot be null in range()");
@@ -182,13 +191,21 @@ public class KdTree {
             this.point = point;
             this.distSquared = distSquared;
         }
+
+        @Override
+        public String toString() {
+            return "PointDistPair{" +
+                "point=" + point +
+                ", distSquared=" + distSquared +
+                '}';
+        }
     }
 
     private PointDistPair nearestQuery(Node node, Point2D queryPoint, PointDistPair champ, int depth) {
         if (node != null && node.rect.distanceSquaredTo(queryPoint) < champ.distSquared) {
             PointDistPair nodeDistPair = new PointDistPair(node.p, node.p.distanceSquaredTo(queryPoint));
             if (nodeDistPair.distSquared < champ.distSquared) champ = nodeDistPair;
-            if (comparator(depth).compare(queryPoint, node.p) <= 0) {
+            if (comparator(depth).compare(queryPoint, node.p) < 0) {
                 // go lb then rt
                 champ = nearestQuery(node.lb, queryPoint, champ, depth + 1);
                 champ = nearestQuery(node.rt, queryPoint, champ, depth + 1);

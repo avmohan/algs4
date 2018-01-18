@@ -38,7 +38,6 @@ public class PointSET {
 
     // Draw all points to standard draw
     public void draw() {
-        // TODO: Should we draw the lines as well?
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.setPenRadius(0.01);
         set.forEach(p -> StdDraw.point(p.x(), p.y()));

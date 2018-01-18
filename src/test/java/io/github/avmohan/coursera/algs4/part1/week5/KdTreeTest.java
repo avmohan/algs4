@@ -2,6 +2,7 @@ package io.github.avmohan.coursera.algs4.part1.week5;
 
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -132,7 +133,29 @@ class KdTreeTest {
         assertThat(new KdTree().nearest(new Point2D(0, 0))).isNull();
     }
 
-    // TODO - Read input from file
+    @Ignore // Only added for testing the sequence of calls
+    @Test
+    void testForFailingTestCaseAroundTraversalOrderOfNearest() throws Exception {
+        KdTree set = new KdTree();
+        double input[][] = {
+            {0.7, 0.2}, // A
+            {0.5, 0.4}, // B
+            {0.2, 0.3}, // C
+            {0.4, 0.7}, // D
+            {0.9, 0.6}  // E
+        };
+        Arrays.stream(input)
+            .map(p -> new Point2D(p[0], p[1]))
+            .forEach(set::insert);
+        Point2D queryPoint = new Point2D(0.6, 0.4);
+        assertThat(set.nearest(queryPoint))
+            .isEqualTo(new Point2D(0.5, 0.4));
+        // Sequence (of points involved in calls to distanceSquaredTo(queryPoint)
+        // My sequence - A B C D
+        // Expected sequence - A B D C
+    }
+
+
     private KdTree input10() {
         KdTree set = new KdTree();
         double input[][] = {
@@ -152,4 +175,5 @@ class KdTreeTest {
             .forEach(set::insert);
         return set;
     }
+
 }
