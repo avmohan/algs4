@@ -9,11 +9,7 @@ public class Board {
 
     // the grid and the dimension
     private final int[][] blocks;
-    private final int n;
-
-    // Cache hamming & manhattan values of this board to avoid recomputation.
-    private int hamming = -1;
-    private int manhattan = -1;
+    private final short n;
 
     private Position zero;
 
@@ -25,7 +21,7 @@ public class Board {
 
     private Board(int[][] blocks, boolean copy) {
         assert blocks.length == blocks[0].length;
-        this.n = blocks.length;
+        this.n = (short) blocks.length;
         if (!copy) {
             this.blocks = blocks;
         } else {
@@ -84,13 +80,11 @@ public class Board {
 
     // number of blocks out of place
     public int hamming() {
-        if (hamming == -1) {
-            hamming = 0;
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (blocks[i][j] != 0 && blocks[i][j] != goalBlock(i, j))
-                        hamming++;
-                }
+        int hamming = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (blocks[i][j] != 0 && blocks[i][j] != goalBlock(i, j))
+                    hamming++;
             }
         }
         return hamming;
@@ -99,14 +93,12 @@ public class Board {
 
     // sum of Manhattan distances between blocks and goal
     public int manhattan() {
-        if (manhattan == -1) {
-            manhattan = 0;
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    int x = blocks[i][j];
-                    if (x != 0)
-                        manhattan += abs(goalRow(x) - i) + abs(goalCol(x) - j);
-                }
+        int manhattan = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                int x = blocks[i][j];
+                if (x != 0)
+                    manhattan += abs(goalRow(x) - i) + abs(goalCol(x) - j);
             }
         }
         return manhattan;
@@ -210,12 +202,13 @@ public class Board {
 
 
     private static class Position {
-        final int row;
-        final int col;
+        final short row;
+        final short col;
 
         Position(int row, int col) {
-            this.row = row;
-            this.col = col;
+            this.row = (short) row;
+            this.col = (short) col;
         }
+
     }
 }

@@ -20,11 +20,13 @@ public class Solver {
         final Board board;
         final int moves;
         final Node prev;
+        final int boardManhattan;
 
         Node(Board board, Node prev) {
             this.board = board;
             this.prev = prev;
             this.moves = (prev != null) ? prev.moves + 1 : 0;
+            this.boardManhattan = board.manhattan();
         }
 
         Node(Board board) {
@@ -32,7 +34,7 @@ public class Solver {
         }
 
         int manhattan() {
-            return moves + board.manhattan();
+            return boardManhattan + moves;
         }
 
         int hamming() {
