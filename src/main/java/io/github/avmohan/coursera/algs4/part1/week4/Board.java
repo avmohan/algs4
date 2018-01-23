@@ -3,12 +3,8 @@ package io.github.avmohan.coursera.algs4.part1.week4;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-
-// TODO : Simplify the code
-// Add a private method for swapping positions
-// Remove the caching of zero - asymptotically makes no difference to time taken
-// Add a private swap method to swap 2 positions, but remove the direct handling of block[][]
 
 public class Board {
 
@@ -51,6 +47,7 @@ public class Board {
                 }
             }
         }
+        if (zero == null) throw new IllegalStateException("No zero in board");
         return zero;
     }
 
@@ -77,15 +74,10 @@ public class Board {
         return n * row + col + 1;
     }
 
-//    private void swap(Position pos1, Position pos2) {
-//        swap(blocks, pos1.row, pos1.col, pos2.row, pos2.col);
-//    }
-
-    // swap blocks at (row1, col1) and (row2, col2)
-    private static void swap(short[][] blocks, int row1, int col1, int row2, int col2) {
-        short temp = blocks[row1][col1];
-        blocks[row1][col1] = blocks[row2][col2];
-        blocks[row2][col2] = temp;
+    private void swap(Position pos1, Position pos2) {
+        short temp = blocks[(int) pos1.row][(int) pos1.col];
+        blocks[(int) pos1.row][(int) pos1.col] = blocks[(int) pos2.row][(int) pos2.col];
+        blocks[(int) pos2.row][(int) pos2.col] = temp;
     }
 
     // number of blocks out of place
@@ -136,8 +128,8 @@ public class Board {
     public Board twin() {
         Board twin = new Board(blocks);
         short[][] nBlocks = twin.blocks;
-        if (nBlocks[0][0] != 0 && nBlocks[0][1] != 0) swap(nBlocks, 0, 0, 0, 1);
-        else if (nBlocks[1][0] != 0 && nBlocks[1][1] != 0) swap(nBlocks, 1, 0, 1, 1);
+        if (nBlocks[0][0] != 0 && nBlocks[0][1] != 0) twin.swap(new Position(0, 0), new Position(0, 1));
+        else if (nBlocks[1][0] != 0 && nBlocks[1][1] != 0) twin.swap(new Position(1, 0), new Position(1, 1));
         return twin;
     }
 
@@ -168,18 +160,18 @@ public class Board {
     // Return the board after a particular move.
     private Board afterMove(Move m, Position zero) {
         Position nZero = new Position(zero.row + m.dRow, zero.col + m.dCol);
-        assert isValidPos(nZero.row, nZero.col);
-        Board nBoard = new Board(blocks);
-        swap(nBoard.blocks, zero.row, zero.col, nZero.row, nZero.col);
+        assert isValidPos(nZero);
+        Board nBoard = twin();
+        nBoard.swap(zero, nZero);
         return nBoard;
     }
 
-    private boolean isValidPos(int i, int j) {
-        return 0 <= i && i < n && 0 <= j && j < n;
+    private boolean isValidPos(Position p) {
+        return 0 <= p.row && p.row < n && 0 <= p.col && p.col < n;
     }
 
     private boolean isValidMove(Move m, Position zero) {
-        return isValidPos(zero.row + m.dRow, zero.col + m.dCol);
+        return isValidPos(zero.move(m));
     }
 
     // all neighboring boards
@@ -216,5 +208,22 @@ public class Board {
             this.col = (short) col;
         }
 
+        Position move(Move m) {
+            return new Position(row + m.dRow, col + m.dCol);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Position position = (Position) o;
+            return row == position.row &&
+                col == position.col;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(row, col);
+        }
     }
 }
