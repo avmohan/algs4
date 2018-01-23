@@ -5,32 +5,29 @@ import java.util.Arrays;
 import java.util.List;
 
 
+// TODO : Simplify the code
+// Add a private method for swapping positions
+// Remove the caching of zero - asymptotically makes no difference to time taken
+// Add a private swap method to swap 2 positions, but remove the direct handling of block[][]
+
 public class Board {
 
     // the grid and the dimension
     private final int[][] blocks;
     private final short n;
 
-    private Position zero;
-
     // construct a board from an n-by-n array of blocks
     // (where blocks[i][j] = block in row i, column j)
     public Board(int[][] blocks) {
-        this(blocks, true);
-    }
-
-    private Board(int[][] blocks, boolean copy) {
         assert blocks.length == blocks[0].length;
         this.n = (short) blocks.length;
-        if (!copy) {
-            this.blocks = blocks;
-        } else {
-            this.blocks = copy2d(blocks);
-            findZeroPosition();
-        }
+        this.blocks = new int[n][n];
+        for (int i = 0; i < blocks.length; i++)
+            this.blocks[i] = Arrays.copyOf(blocks[i], blocks[i].length);
     }
 
-    private void findZeroPosition() {
+    private Position findZeroPosition() {
+        Position zero = null;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (blocks[i][j] == 0) {
@@ -38,6 +35,7 @@ public class Board {
                 }
             }
         }
+        return zero;
     }
 
     // board dimension n
@@ -63,19 +61,15 @@ public class Board {
         return n * row + col + 1;
     }
 
+    private void swap(Position pos1, Position pos2) {
+        swap(blocks, pos1.row, pos1.col, pos2.row, pos2.col);
+    }
+
     // swap blocks at (row1, col1) and (row2, col2)
     private static void swap(int[][] blocks, int row1, int col1, int row2, int col2) {
         int temp = blocks[row1][col1];
         blocks[row1][col1] = blocks[row2][col2];
         blocks[row2][col2] = temp;
-    }
-
-    // make a copy of blocks[][]
-    private static int[][] copy2d(int[][] blocks) {
-        int[][] nBlocks = new int[blocks.length][];
-        for (int i = 0; i < blocks.length; i++)
-            nBlocks[i] = Arrays.copyOf(blocks[i], blocks[i].length);
-        return nBlocks;
     }
 
     // number of blocks out of place
@@ -124,12 +118,10 @@ public class Board {
 
     // a board that is obtained by exchanging any pair of blocks
     public Board twin() {
-        int[][] nBlocks = copy2d(blocks);
+        Board twin = new Board(blocks);
+        int[][] nBlocks = twin.blocks;
         if (nBlocks[0][0] != 0 && nBlocks[0][1] != 0) swap(nBlocks, 0, 0, 0, 1);
         else if (nBlocks[1][0] != 0 && nBlocks[1][1] != 0) swap(nBlocks, 1, 0, 1, 1);
-
-        Board twin = new Board(nBlocks, false);
-        twin.zero = this.zero;
         return twin;
     }
 
@@ -159,13 +151,13 @@ public class Board {
 
     // Return the board after a particular move.
     private Board afterMove(Move m) {
+        Position zero = findZeroPosition();
         Position nZero = new Position(zero.row + m.dRow, zero.col + m.dCol);
         assert isValidPos(nZero.row, nZero.col);
 
-        int[][] nBlocks = copy2d(blocks);
+        Board nBoard = new Board(blocks);
+        int[][] nBlocks = nBoard.blocks;
         swap(nBlocks, zero.row, zero.col, nZero.row, nZero.col);
-        Board nBoard = new Board(nBlocks, false);
-        nBoard.zero = nZero;
         return nBoard;
     }
 
@@ -173,15 +165,16 @@ public class Board {
         return 0 <= i && i < n && 0 <= j && j < n;
     }
 
-    private boolean isValidMove(Move m) {
+    private boolean isValidMove(Move m, Position zero) {
         return isValidPos(zero.row + m.dRow, zero.col + m.dCol);
     }
 
     // all neighboring boards
     public Iterable<Board> neighbors() {
         List<Board> neighbours = new ArrayList<>();
+        Position zero = findZeroPosition();
         for (Move move : Move.values()) {
-            if (isValidMove(move)) {
+            if (isValidMove(move, zero)) {
                 neighbours.add(afterMove(move));
             }
         }
