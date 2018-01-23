@@ -13,7 +13,7 @@ import java.util.List;
 public class Board {
 
     // the grid and the dimension
-    private final int[][] blocks;
+    private final short[][] blocks;
     private final short n;
 
     // construct a board from an n-by-n array of blocks
@@ -21,9 +21,25 @@ public class Board {
     public Board(int[][] blocks) {
         assert blocks.length == blocks[0].length;
         this.n = (short) blocks.length;
-        this.blocks = new int[n][n];
-        for (int i = 0; i < blocks.length; i++)
-            this.blocks[i] = Arrays.copyOf(blocks[i], blocks[i].length);
+        this.blocks = new short[n][n];
+        for (int i = 0; i < n; i++) {
+            this.blocks[i] = new short[n];
+            for (int j = 0; j < n; j++) {
+                this.blocks[i][j] = (short) blocks[i][j];
+            }
+        }
+    }
+
+    private Board(short[][] blocks) {
+        assert blocks.length == blocks[0].length;
+        this.n = (short) blocks.length;
+        this.blocks = new short[n][n];
+        for (int i = 0; i < n; i++) {
+            this.blocks[i] = new short[n];
+            for (int j = 0; j < n; j++) {
+                this.blocks[i][j] = blocks[i][j];
+            }
+        }
     }
 
     private Position findZeroPosition() {
@@ -61,13 +77,13 @@ public class Board {
         return n * row + col + 1;
     }
 
-    private void swap(Position pos1, Position pos2) {
-        swap(blocks, pos1.row, pos1.col, pos2.row, pos2.col);
-    }
+//    private void swap(Position pos1, Position pos2) {
+//        swap(blocks, pos1.row, pos1.col, pos2.row, pos2.col);
+//    }
 
     // swap blocks at (row1, col1) and (row2, col2)
-    private static void swap(int[][] blocks, int row1, int col1, int row2, int col2) {
-        int temp = blocks[row1][col1];
+    private static void swap(short[][] blocks, int row1, int col1, int row2, int col2) {
+        short temp = blocks[row1][col1];
         blocks[row1][col1] = blocks[row2][col2];
         blocks[row2][col2] = temp;
     }
@@ -119,7 +135,7 @@ public class Board {
     // a board that is obtained by exchanging any pair of blocks
     public Board twin() {
         Board twin = new Board(blocks);
-        int[][] nBlocks = twin.blocks;
+        short[][] nBlocks = twin.blocks;
         if (nBlocks[0][0] != 0 && nBlocks[0][1] != 0) swap(nBlocks, 0, 0, 0, 1);
         else if (nBlocks[1][0] != 0 && nBlocks[1][1] != 0) swap(nBlocks, 1, 0, 1, 1);
         return twin;
@@ -150,14 +166,11 @@ public class Board {
     }
 
     // Return the board after a particular move.
-    private Board afterMove(Move m) {
-        Position zero = findZeroPosition();
+    private Board afterMove(Move m, Position zero) {
         Position nZero = new Position(zero.row + m.dRow, zero.col + m.dCol);
         assert isValidPos(nZero.row, nZero.col);
-
         Board nBoard = new Board(blocks);
-        int[][] nBlocks = nBoard.blocks;
-        swap(nBlocks, zero.row, zero.col, nZero.row, nZero.col);
+        swap(nBoard.blocks, zero.row, zero.col, nZero.row, nZero.col);
         return nBoard;
     }
 
@@ -175,7 +188,7 @@ public class Board {
         Position zero = findZeroPosition();
         for (Move move : Move.values()) {
             if (isValidMove(move, zero)) {
-                neighbours.add(afterMove(move));
+                neighbours.add(afterMove(move, zero));
             }
         }
         return neighbours;
