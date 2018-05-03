@@ -127,7 +127,7 @@ public class WordNet {
         if (!(isNoun(nounA) && isNoun(nounB))) {
             throw new IllegalArgumentException("Both nouns must be present in wordnet");
         }
-        if(nounA.equals(nounB)) return 0;
+        if (nounA.equals(nounB)) return 0;
         return sap.length(nounMap.get(nounA), nounMap.get(nounB));
     }
 

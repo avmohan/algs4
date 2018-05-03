@@ -2,6 +2,9 @@ package io.github.avmohan.coursera.algs4.part2.week1;
 
 import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Collections;
 
@@ -40,7 +43,7 @@ public class SAP {
     }
 
     private void validate(Iterable<Integer> vs) {
-        if(vs == null) throw new IllegalArgumentException("vs cannot be null");
+        if (vs == null) throw new IllegalArgumentException("vs cannot be null");
         vs.forEach(this::validate);
     }
 
@@ -76,5 +79,19 @@ public class SAP {
             this.length = length;
         }
     }
+
+    public static void main(String[] args) {
+        In in = new In(args[0]);
+        Digraph G = new Digraph(in);
+        SAP sap = new SAP(G);
+        while (!StdIn.isEmpty()) {
+            int v = StdIn.readInt();
+            int w = StdIn.readInt();
+            int length = sap.length(v, w);
+            int ancestor = sap.ancestor(v, w);
+            StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
+        }
+    }
+
 
 }
