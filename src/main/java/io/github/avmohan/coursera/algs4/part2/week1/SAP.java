@@ -40,6 +40,7 @@ public class SAP {
     }
 
     private void validate(Iterable<Integer> vs) {
+        if(vs == null) throw new IllegalArgumentException("vs cannot be null");
         vs.forEach(this::validate);
     }
 

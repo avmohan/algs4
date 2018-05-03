@@ -5,6 +5,7 @@ import edu.princeton.cs.algs4.In;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -26,6 +27,16 @@ class SAPTest {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> sap.length(3, 5));
     }
+
+
+    @Test
+    public void testNullIterableThrowsIae() throws Exception {
+        Digraph digraph = new Digraph(5);
+        SAP sap = new SAP(digraph);
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> sap.ancestor(Arrays.asList(1, 2), null));
+    }
+
 
     @Test
     public void testCommonScenario() throws Exception {
