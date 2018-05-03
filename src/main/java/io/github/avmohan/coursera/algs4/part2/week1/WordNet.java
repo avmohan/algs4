@@ -6,6 +6,7 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.TopologicalX;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -57,8 +58,12 @@ public class WordNet {
         String line;
         int numSynsets = 0;
         while ((line = in.readLine()) != null) {
-            String[] fields = line.split(COMMA);
-            if (fields.length != 3) throw new IllegalStateException();
+            String[] fields = line.split(COMMA, 3);
+            if (fields.length != 3) {
+                System.err.println(line);
+                System.err.println(Arrays.toString(fields));
+                throw new IllegalStateException();
+            }
             this.synsets.add(fields[1]);
             String[] nouns = fields[1].split(SPACE);
             for (String noun : nouns) {
@@ -73,7 +78,10 @@ public class WordNet {
         in = new In(hypernyms);
         while ((line = in.readLine()) != null) {
             String[] fields = line.split(COMMA, 2);
-            if (fields.length != 2) throw new IllegalStateException();
+            if (fields.length < 2) {
+                // root node
+                continue;
+            }
             int src = Integer.parseInt(fields[0]);
             String[] neighbours = fields[1].split(COMMA);
             for (String neighbour : neighbours) {
