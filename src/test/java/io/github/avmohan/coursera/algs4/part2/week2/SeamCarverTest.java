@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 class SeamCarverTest {
@@ -121,5 +122,33 @@ class SeamCarverTest {
         SeamCarver sc = new SeamCarver(pic);
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> sc.energy(x, y));
+    }
+
+    @Test
+    void removeVerticalSeamReducesWidthByOne() {
+        Picture pic = new Picture(5, 5);
+        SeamCarver sc = new SeamCarver(pic);
+        int[] seam = {0, 1, 0, 1, 2};
+        sc.removeVerticalSeam(seam);
+        assertThat(sc.picture().width()).isEqualTo(4);
+    }
+
+    @Test
+    void removeHorizontalSeamReducesHeightByOne() {
+        Picture pic = new Picture(5, 5);
+        SeamCarver sc = new SeamCarver(pic);
+        int[] seam = {0, 1, 0, 1, 2};
+        sc.removeHorizontalSeam(seam);
+        assertThat(sc.picture().height()).isEqualTo(4);
+    }
+
+    @Test
+    void pictureGivenToConstructorIsNotMutated() {
+        Picture pic = new Picture(5, 5);
+        Picture pic2 = new Picture(pic);
+        SeamCarver sc = new SeamCarver(pic);
+        int[] seam = {0, 1, 0, 1, 2};
+        sc.removeHorizontalSeam(seam);
+        assertThat(pic).isEqualTo(pic2);
     }
 }
