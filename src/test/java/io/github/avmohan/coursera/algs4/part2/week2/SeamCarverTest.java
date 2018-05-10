@@ -151,4 +151,18 @@ class SeamCarverTest {
         sc.removeHorizontalSeam(seam);
         assertThat(pic).isEqualTo(pic2);
     }
+
+    @Test
+    void findHorizontalSeamGivesSeamOfCorrectLength() {
+        Picture pic = new Picture(4, 5);
+        SeamCarver sc = new SeamCarver(pic);
+        assertThat(sc.findHorizontalSeam()).hasSize(4);
+    }
+
+    @Test
+    void findVerticalSeamGivesSeamOfCorrectLength() {
+        Picture pic = new Picture(4, 5);
+        SeamCarver sc = new SeamCarver(pic);
+        assertThat(sc.findVerticalSeam()).hasSize(5);
+    }
 }

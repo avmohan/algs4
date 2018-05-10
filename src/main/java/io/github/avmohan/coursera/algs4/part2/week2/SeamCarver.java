@@ -2,7 +2,7 @@ package io.github.avmohan.coursera.algs4.part2.week2;
 
 import edu.princeton.cs.algs4.Picture;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class SeamCarver {
 
@@ -46,17 +46,110 @@ public class SeamCarver {
         return red * red + green * green + blue * blue;
     }
 
+    private boolean isValid(int x, int y) {
+        return x >= 0 && x < width() && y >= 0 && y < height();
+    }
 
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam() {
-        // TODO
-        return null;
+        // initialize matrices
+        double[][] energy = new double[height()][width()];
+        double[][] dist = new double[height()][width()];
+        int[][] fromY = new int[height()][width()];
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                energy[y][x] = energy(x, y);
+                fromY[y][x] = -1;
+                if (x == 0)
+                    dist[y][x] = energy[y][x];
+                else
+                    dist[y][x] = Double.POSITIVE_INFINITY;
+            }
+        }
+
+        // visit in topological order (LtoR for horizontal seam)
+        int dys[] = {-1, 0, 1};
+        for (int x = 0; x < width(); x++) {
+            for (int y = 0; y < height(); y++) {
+                for (int dy : dys) {
+                    if (isValid(x + 1, y + dy) &&
+                            dist[y][x] + energy[y + dy][x + 1] < dist[y + dy][x + 1]) {
+                        dist[y + dy][x + 1] = dist[y][x] + energy[y + dy][x + 1];
+                        fromY[y + dy][x + 1] = y;
+                    }
+                }
+            }
+        }
+        int[] seam = new int[width()];
+        double minDist = Double.POSITIVE_INFINITY;
+        for (int y = 0; y < height(); y++) {
+            if (dist[y][width() - 1] < minDist) {
+                minDist = dist[y][width() - 1];
+                seam[width() - 1] = y;
+            }
+        }
+        for (int x = width() - 2; x >= 0; x--) {
+            seam[x] = fromY[seam[x + 1]][x];
+        }
+        return seam;
     }
 
     // sequence of indices for vertical seam
     public int[] findVerticalSeam() {
-        // TODO
-        return null;
+
+        // for caching energy values
+        double[][] energy = new double[height()][width()];
+
+        // for maintaining dist to each pixel
+        double[][] dist = new double[height()][width()];
+
+        // for storing the column of the pixel in the previous row
+        // from which this pixel is connected in the shortest path
+        int[][] fromX = new int[height()][width()];
+
+        // initialize everything
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                energy[y][x] = energy(x, y);
+                fromX[y][x] = -1;
+                if (y == 0)
+                    dist[y][x] = energy[y][x];
+                else
+                    dist[y][x] = Double.POSITIVE_INFINITY;
+            }
+        }
+
+        // visit in topological order (TopToBot for vertical seam)
+        int dxs[] = {-1, 0, 1};
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                for (int dx : dxs) {
+                    if (isValid(x + dx, y + 1) &&
+                            dist[y][x] + energy[y + 1][x + dx] < dist[y + 1][x + dx]) {
+                        dist[y + 1][x + dx] = dist[y][x] + energy[y + 1][x + dx];
+                        fromX[y + 1][x + dx] = x;
+                    }
+                }
+            }
+        }
+        int[] seam = new int[height()];
+        double minDist = Double.POSITIVE_INFINITY;
+
+        // Find minimum dist pixel in last row. This is the
+        // last pixel of the shortest TopToBot path.
+        for (int x = 0; x < width(); x++) {
+            if (dist[height() - 1][x] < minDist) {
+                minDist = dist[height() - 1][x];
+                seam[height() - 1] = x;
+            }
+        }
+
+        // Follow fromX to get the pixels in the shortest
+        // TopToBot path, and construct the vertical seam
+        for (int y = height() - 2; y >= 0; y--) {
+            seam[y] = fromX[y][seam[y + 1]];
+        }
+        return seam;
     }
 
     // remove horizontal seam from current picture
