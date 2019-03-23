@@ -32,9 +32,7 @@ public class Board {
         this.blocks = new short[n][n];
         for (int i = 0; i < n; i++) {
             this.blocks[i] = new short[n];
-            for (int j = 0; j < n; j++) {
-                this.blocks[i][j] = blocks[i][j];
-            }
+            System.arraycopy(blocks[i], 0, this.blocks[i], 0, n);
         }
     }
 
@@ -74,10 +72,11 @@ public class Board {
         return n * row + col + 1;
     }
 
+    // Swaps blocks at pos1 & pos2
     private void swap(Position pos1, Position pos2) {
-        short temp = blocks[(int) pos1.row][(int) pos1.col];
-        blocks[(int) pos1.row][(int) pos1.col] = blocks[(int) pos2.row][(int) pos2.col];
-        blocks[(int) pos2.row][(int) pos2.col] = temp;
+        short temp = blocks[pos1.row][pos1.col];
+        blocks[pos1.row][pos1.col] = blocks[pos2.row][pos2.col];
+        blocks[pos2.row][pos2.col] = temp;
     }
 
     // number of blocks out of place
@@ -161,7 +160,7 @@ public class Board {
     private Board afterMove(Move m, Position zero) {
         Position nZero = new Position(zero.row + m.dRow, zero.col + m.dCol);
         assert isValidPos(nZero);
-        Board nBoard = twin();
+        Board nBoard = new Board(blocks);
         nBoard.swap(zero, nZero);
         return nBoard;
     }
